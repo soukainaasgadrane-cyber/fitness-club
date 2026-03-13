@@ -1,25 +1,40 @@
 <?php
-
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\SubscriptionPlan;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // ===== 1. Créer l'admin =====
+        User::firstOrCreate(
+            ['email' => 'admin@fitness.com'],
+            [
+                'name' => 'Admin',
+                'password' => bcrypt('password'),
+                'is_admin' => true,
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // ===== 2. Créer un utilisateur test =====
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => bcrypt('password'),
+                'is_admin' => false,
+            ]
+        );
+
+        // ===== 3. Appeler TES seeders =====
+        $this->call(SubscriptionPlanSeeder::class);
+        
+        // Message de confirmation
+        $this->command->info('✅ Database seeding completed successfully!');
+        $this->command->info('✅ Admin: admin@fitness.com / password');
+        $this->command->info('✅ Test: test@example.com / password');
     }
 }
