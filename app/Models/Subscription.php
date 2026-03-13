@@ -50,4 +50,41 @@ class Subscription extends Model
         }
         return $this->payment_status;
     }
+    // زيدي مع العلاقات الموجودة
+public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
+
+// دالة لتسجيل دفعة جديدة
+public function recordPayment($amount, $method, $userId, $notes = null)
+{
+    // إنشاء الدفعة
+    $payment = Payment::create([
+        'payment_number' => Payment::generatePaymentNumber(),
+        'subscription_id' => $this->id,
+        'member_id' => $this->member_id,
+        'user_id' => $userId,
+        'amount' => $amount,
+        'payment_method' => $method,
+        'payment_date' => now(),
+        'notes' => $notes,
+        'status' => 'completed'
+    ]);
+
+    // تحديث المبلغ المدفوع في الاشتراك
+    $this->amount_paid += $amount;
+    $this->remaining_amount = $this->price - $this->amount_paid;
+    
+    // تحديث حالة الدفع
+    if ($this->remaining_amount <= 0) {
+        $this->payment_status = 'paid';
+    } elseif ($this->amount_paid > 0) {
+        $this->payment_status = 'partial';
+    }
+    
+    $this->save();
+
+    return $payment;
+}
 }
