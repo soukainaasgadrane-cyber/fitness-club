@@ -6,13 +6,23 @@ use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\FinanceController;
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProgramController;     
+use App\Http\Controllers\ExerciseController;    
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\BMIController;         
 
+use App\Http\Controllers\Admin\ProgramController as AdminProgramController;
+use App\Http\Controllers\Admin\ExerciseController as AdminExerciseController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 
 
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home');
+})->name('home');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
      ->middleware(['auth', 'verified'])
@@ -23,8 +33,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-require __DIR__.'/auth.php';
 
 
 
@@ -102,3 +110,25 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
 });
+
+Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
+Route::get('/exercises', [ExerciseController::class, 'index'])->name('exercises.index');
+Route::get('/bmi-calculator', [BMIController::class, 'index'])->name('bmi');
+
+// المسارات المحمية (تحتاج تسجيل دخول)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('members', AdminMemberController::class);
+});
+
+require __DIR__.'/auth.php';
