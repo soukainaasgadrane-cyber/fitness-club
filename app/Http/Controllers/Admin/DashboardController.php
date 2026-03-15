@@ -12,8 +12,8 @@ class DashboardController extends Controller
     {
         
         $totalMembers = Member::count();
-        $activeSubscriptions = Subscription::active()->count();
-        $expiredSubscriptions = Subscription::expired()->count();
+        $activeSubscriptions = Subscription::where('is_active', true)->count();
+        $expiredSubscriptions = Subscription::where('end_date', '<', now())->count();
         $newMembersThisMonth = Member::whereMonth('created_at', now()->month)->count();
         
         
@@ -29,19 +29,13 @@ class DashboardController extends Controller
                                    ->where('is_active', true)
                                    ->get();
         
-        // إحصائيات حسب نوع الاشتراك
-        $subscriptionsByType = Subscription::selectRaw('plan_type, count(*) as count')
-                                          ->groupBy('plan_type')
-                                          ->get();
-        
         return view('admin.dashboard', compact(
             'totalMembers',
             'activeSubscriptions',
             'expiredSubscriptions',
             'newMembersThisMonth',
             'recentMembers',
-            'expiringSoon',
-            'subscriptionsByType'
+            'expiringSoon'
         ));
     }
 }

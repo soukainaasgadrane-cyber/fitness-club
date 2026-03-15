@@ -19,9 +19,6 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
-            // Index for better performance
-            $table->index(['member_id', 'start_date', 'end_date']);
         });
     }
 

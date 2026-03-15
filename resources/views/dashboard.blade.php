@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="alert alert-success">
                 <h4 class="alert-heading">Bonjour {{ Auth::user()->name }}! 👋</h4>
-                <p>Vous êtes connecté(e) avec succès</p>
+                <p>Vous êtes connecté avec succès</p>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
                         Exercices
                     </a>
                     <a href="{{ route('bmi') }}" class="btn btn-outline-info mb-2 w-100">
-                        Calculer l'IMC
+                        Calculer l’IMC
                     </a>
                 </div>
             </div>

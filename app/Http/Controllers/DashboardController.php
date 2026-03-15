@@ -10,12 +10,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         
-        
         if ($user && $user->is_admin) {
             return redirect()->route('admin.dashboard');
         }
         
         
-        return view('dashboard');
+        return view('dashboard'); 
     }
 }
