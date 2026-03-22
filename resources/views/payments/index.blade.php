@@ -1,50 +1,73 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Historique des paiements</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .alert { padding:10px; margin-bottom: 20px; border-radius: 4px; }
-        .alert-success { background-color: #d4edda; color: #155724; }
-        a { text-decoration: none; color: #007BFF; }
-    </style>
-</head>
-<body>
+@extends('admin.layouts.app')
 
-<h2>Historique des paiements</h2>
+@section('title', 'Paiements')
+@section('page-title', 'Historique des paiements')
 
-<!-- Message success -->
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
+@section('content')
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card text-center bg-success text-white">
+            <div class="stat-number">{{ number_format($totalReceived, 2) }} DH</div>
+            <div class="stat-label">Total encaissé</div>
+        </div>
     </div>
-@endif
+    <div class="col-md-4">
+        <div class="stat-card text-center bg-info text-white">
+            <div class="stat-number">{{ number_format($todayPayments, 2) }} DH</div>
+            <div class="stat-label">Aujourd'hui</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card text-center bg-warning text-white">
+            <div class="stat-number">{{ $pendingCount }}</div>
+            <div class="stat-label">En attente</div>
+        </div>
+    </div>
+</div>
 
-<a href="{{ route('payments.create') }}">Ajouter Payment</a>
-
-<table>
-<tr>
-<th>Membre</th>
-<th>Plan</th>
-<th>Montant</th>
-<th>Status</th>
-<th>Date</th>
-</tr>
-
-@foreach($payments as $payment)
-<tr>
-<td>{{ $payment->member->name }}</td>
-<td>{{ $payment->plan->name }}</td>
-<td>{{ $payment->amount }}</td>
-<td>{{ $payment->status }}</td>
-<td>{{ $payment->payment_date }}</td>
-</tr>
-@endforeach
-
-</table>
-
-</body>
-</html>
+<div class="card">
+    <div class="card-header">
+        <h5>Tous les paiements</h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                #####
+                    <th>Facture N°</th>
+                    <th>Membre</th>
+                    <th>Montant</th>
+                    <th>Méthode</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($payments as $payment)
+                <tr>
+                    <td>{{ $payment->invoice_number }}</td>
+                    <td>{{ $payment->subscription->member->full_name }}</td>
+                    <td>{{ number_format($payment->total_paid, 2) }} DH</td>
+                    <td>{{ $payment->payment_method_name }}</td>
+                    <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                    <td>
+                        <span class="badge bg-{{ $payment->status == 'completed' ? 'success' : 'warning' }}">
+                            {{ $payment->status_name }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ route('admin.payments.show', $payment) }}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('admin.payments.download', $payment) }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        {{ $payments->links() }}
+    </div>
+</div>
+@endsection

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,24 +8,53 @@ class Payment extends Model
 {
     use HasFactory;
 
-    // 💚 Fields li katsift f create() / save()
     protected $fillable = [
-        'member_id',
-        'plan_id',
+        'subscription_id',
+        'invoice_number',
         'amount',
+        'discount_applied',
+        'tax',
+        'total_paid',
+        'payment_method',
+        'transaction_id',
         'payment_date',
         'status',
+        'notes',
+        'receipt_path'
     ];
 
-    // Relation m3a Member
-    public function member()
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'discount_applied' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'total_paid' => 'decimal:2',
+        'payment_date' => 'date',
+    ];
+
+    public function subscription()
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Subscription::class);
     }
 
-    // Relation m3a Plan
-    public function plan()
+    public function getPaymentMethodNameAttribute()
     {
-        return $this->belongsTo(Plan::class);
+        $methods = [
+            'cash' => 'Espèces',
+            'card' => 'Carte bancaire',
+            'bank_transfer' => 'Virement bancaire',
+            'check' => 'Chèque'
+        ];
+        return $methods[$this->payment_method] ?? $this->payment_method;
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $statuses = [
+            'pending' => 'En attente',
+            'completed' => 'Payé',
+            'failed' => 'Échoué',
+            'refunded' => 'Remboursé'
+        ];
+        return $statuses[$this->status] ?? $this->status;
     }
 }
