@@ -134,7 +134,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/test-soukaina', function() {
     return 'soukaina fonctionne !';
 });
-// ========== ROUTES GHITA ==========
+// Routes Ghita
 Route::get('/admin/subscriptions', function() {
     return view('admin.subscriptions.index');
 })->middleware(['auth'])->name('admin.subscriptions.index');
@@ -146,4 +146,25 @@ Route::get('/admin/payments', function() {
 Route::get('/admin/finance', function() {
     return view('admin.finance.index');
 })->middleware(['auth'])->name('admin.finance.index');
+Route::get('/bmi-calculator', [BMIController::class, 'index'])->name('bmi');
+Route::post('/bmi-calculator', [BMIController::class, 'index'])->name('bmi.calculate');
+// Programmes
+Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
+Route::get('/programs/{id}', [ProgramController::class, 'show'])->name('programs.show');
+Route::get('/contact', function() {
+    return view('contact');
+})->name('contact');
+// Routes Ghita
+Route::get('/admin/subscriptions', function() {
+    return view('admin.subscriptions.index');
+})->middleware(['auth'])->name('admin.subscriptions.index');
+
+Route::get('/admin/payments', function() {
+    return view('admin.payments.index');
+})->middleware(['auth'])->name('admin.payments.index');
+
+Route::get('/admin/finance', function() {
+    return view('admin.finance.index');
+})->middleware(['auth'])->name('admin.finance.index');
+
 require __DIR__.'/auth.php';
