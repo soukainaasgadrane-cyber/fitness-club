@@ -34,7 +34,7 @@ class PaymentController extends Controller
         'plan_id' => $request->plan_id,
         'amount' => $plan->price,
         'payment_date' => now(),
-        'status' => 'payé'
+        'status' => $request->status
     ]);
 
     return redirect()->route('payments.index')

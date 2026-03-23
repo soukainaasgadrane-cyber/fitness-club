@@ -32,3 +32,8 @@ Route::get('/payments/create', [PaymentController::class,'create'])->name('payme
 Route::post('/payments', [PaymentController::class,'store'])->name('payments.store');
 
 Route::get('/check-subscription/{id}', [PaymentController::class,'checkSubscription']);
+Route::get('/payer', function(){
+    return view('paiement');
+});
+
+Route::post('/payer', [PaymentController::class,'payer'])->name('payer');
