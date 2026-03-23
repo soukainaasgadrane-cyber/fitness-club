@@ -1,90 +1,72 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Abonnements')
-@section('page-title', 'Gestion des abonnements')
-
+@section('title', 'Abonnements - GHITA')
 @section('content')
-<!-- Statistiques -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="stat-card text-center bg-primary text-white">
-            <div class="stat-number">{{ $stats['active'] }}</div>
-            <div class="stat-label">Actifs</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center bg-warning text-white">
-            <div class="stat-number">{{ $stats['expired'] }}</div>
-            <div class="stat-label">Expirés</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center bg-danger text-white">
-            <div class="stat-number">{{ $stats['overdue'] }}</div>
-            <div class="stat-label">En retard</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card text-center bg-success text-white">
-            <div class="stat-number">{{ number_format($stats['total_revenue'], 2) }} DH</div>
-            <div class="stat-label">Chiffre d'affaires</div>
-        </div>
-    </div>
-</div>
-
 <div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <h5>Liste des abonnements</h5>
-        <a href="{{ route('admin.subscriptions.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nouvel abonnement
+    <div class="card-header bg-primary text-white d-flex justify-content-between">
+        <h5 class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Gestion des abonnements
+        </h5>
+        <a href="{{ route('admin.subscriptions.create') }}" class="btn btn-light btn-sm">
+            <i class="fas fa-plus me-1"></i> Nouvel abonnement
         </a>
     </div>
     <div class="card-body">
-        <table class="table">
-            <thead>
-                #####
-                    <th>Membre</th>
-                    <th>Plan</th>
-                    <th>Période</th>
-                    <th>Montant</th>
-                    <th>Statut paiement</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($subscriptions as $sub)
-                <tr>
-                    <td>{{ $sub->member->full_name }}</td>
-                    <td>{{ $sub->plan->name ?? $sub->plan_type }}</td>
-                    <td>{{ $sub->start_date->format('d/m/Y') }} - {{ $sub->end_date->format('d/m/Y') }}</td>
-                    <td>{{ number_format($sub->total_amount, 2) }} DH</td>
-                    <td>
-                        @if($sub->payment_status == 'paid')
-                            <span class="badge bg-success">Payé</span>
-                        @else
-                            <span class="badge bg-danger">Non payé</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($sub->status == 'active')
-                            <span class="badge bg-success">Actif</span>
-                        @elseif($sub->status == 'expired')
-                            <span class="badge bg-secondary">Expiré</span>
-                        @else
-                            <span class="badge bg-warning">En retard</span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('admin.subscriptions.show', $sub) }}" class="btn btn-sm btn-info">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        {{ $subscriptions->links() }}
+        @if($subscriptions->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Membre</th>
+                            <th>Plan</th>
+                            <th>Date début</th>
+                            <th>Date fin</th>
+                            <th>Prix</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($subscriptions as $sub)
+                        <tr>
+                            <td>#{{ $sub->id }}</td>
+                            <td>
+                                <strong>{{ $sub->member->full_name ?? 'N/A' }}</strong><br>
+                                <small class="text-muted">{{ $sub->member->email ?? '' }}</small>
+                            </td>
+                            <td>{{ $sub->plan->name ?? $sub->plan_type }}</td>
+                            <td>{{ \Carbon\Carbon::parse($sub->start_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($sub->end_date)->format('d/m/Y') }}</td>
+                            <td class="fw-bold">{{ number_format($sub->price, 2) }} DH</td>
+                            <td>
+                                @if($sub->payment_status == 'paid')
+                                    <span class="badge bg-success">Payé</span>
+                                @else
+                                    <span class="badge bg-warning">En attente</span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.subscriptions.show', $sub->id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-alt fa-4x text-muted mb-3"></i>
+                <h5>Aucun abonnement trouvé</h5>
+                <p class="text-muted">Commencez par créer votre premier abonnement.</p>
+                <a href="{{ route('admin.subscriptions.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i> Créer un abonnement
+                </a>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

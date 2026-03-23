@@ -29,4 +29,5 @@ class SubscriptionPlan extends Model
     {
         return $this->discount_price ?? $this->price;
     }
+    
 }
