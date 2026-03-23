@@ -131,4 +131,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('members', AdminMemberController::class);
 });
 
+Route::get('/test-soukaina', function() {
+    return 'soukaina fonctionne !';
+});
+// ========== ROUTES GHITA ==========
+Route::get('/admin/subscriptions', function() {
+    return view('admin.subscriptions.index');
+})->middleware(['auth'])->name('admin.subscriptions.index');
+
+Route::get('/admin/payments', function() {
+    return view('admin.payments.index');
+})->middleware(['auth'])->name('admin.payments.index');
+
+Route::get('/admin/finance', function() {
+    return view('admin.finance.index');
+})->middleware(['auth'])->name('admin.finance.index');
 require __DIR__.'/auth.php';

@@ -1,68 +1,42 @@
-{{-- resources/views/admin/finance/index.blade.php --}}
-@extends('admin.layouts.finance')
+@extends('admin.layouts.app')
 
-@section('title', 'Dashboard Finance')
-@section('page-title', 'Tableau de bord financier')
-
+@section('title', 'Finance - Ghita')
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Statistiques financières</h5>
+<div class="card">
+    <div class="card-header">
+        <h5>Dashboard Finance - soukaina ✅</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Page Finance - soukaina fonctionne!
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h3>0 DH</h3>
+                        <small>Total encaissé</small>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <h3>{{ number_format($stats['today_revenue'], 2) }} MAD</h3>
-                                <p>Revenus aujourd'hui</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <h3>{{ number_format($stats['month_revenue'], 2) }} MAD</h3>
-                                <p>Revenus ce mois</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <h3>{{ number_format($stats['year_revenue'], 2) }} MAD</h3>
-                                <p>Revenus cette année</p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <h3>{{ $stats['active_subscriptions'] }}</h3>
-                                <p>Abonnements actifs</p>
-                            </div>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h3>0</h3>
+                        <small>Abonnements actifs</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h3>0</h3>
+                        <small>En attente</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
-
-@section('styles')
-<style>
-    .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .stat-card h3 {
-        font-size: 28px;
-        margin-bottom: 5px;
-    }
-    .stat-card p {
-        margin: 0;
-        opacity: 0.9;
-    }
-</style>
 @endsection
