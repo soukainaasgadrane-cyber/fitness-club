@@ -21,18 +21,24 @@
             Dashboard
         </x-nav-link>
         
-        <!-- LIENS ADMIN (SANS CONDITION) -->
-        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-            Admin
-        </x-nav-link>
-        <x-nav-link :href="route('admin.subscriptions.index')" :active="request()->routeIs('admin.subscriptions.*')">
-            Abonnements
-        </x-nav-link>
-        <x-nav-link :href="route('admin.payments.index')" :active="request()->routeIs('admin.payments.*')">
-            Paiements
-        </x-nav-link>
-        <x-nav-link :href="route('admin.finance.index')" :active="request()->routeIs('admin.finance.*')">
-            Finance
-        </x-nav-link>
+        @if(Auth::user() && Auth::user()->is_admin)
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header">Administration</h6>
+    <a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+        <i class="fas fa-tachometer-alt me-2"></i> Dashboard Admin
+    </a>
+    <a class="dropdown-item" href="{{ route('admin.members.index') }}">
+        <i class="fas fa-users me-2"></i> Membres
+    </a>
+    <a class="dropdown-item" href="{{ route('admin.subscriptions.index') }}">
+        <i class="fas fa-calendar-alt me-2"></i> Abonnements
+    </a>
+    <a class="dropdown-item" href="{{ route('admin.payments.index') }}">
+        <i class="fas fa-credit-card me-2"></i> Paiements
+    </a>
+    <a class="dropdown-item" href="{{ route('admin.finance.index') }}">
+        <i class="fas fa-chart-line me-2"></i> Finance
+    </a>
+@endif
     @endauth
 </div>

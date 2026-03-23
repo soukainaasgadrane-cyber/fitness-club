@@ -1,14 +1,14 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Finance - Ghita')
+@section('title', 'Finance - GHITA')
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <h5>Dashboard Finance - soukaina ✅</h5>
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Dashboard Finance ✅</h5>
     </div>
     <div class="card-body">
         <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i> Page Finance - soukaina fonctionne!
+            <i class="fas fa-check-circle"></i> Page Finance fonctionne!
         </div>
         
         <div class="row">
