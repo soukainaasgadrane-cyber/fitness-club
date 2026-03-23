@@ -9,73 +9,52 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'payment_number',
         'subscription_id',
-        'member_id',
-        'user_id',
+        'invoice_number',
         'amount',
+        'discount_applied',
+        'tax',
+        'total_paid',
         'payment_method',
-        'payment_type',
         'transaction_id',
-        'check_number',
         'payment_date',
-        'notes',
         'status',
+        'notes',
         'receipt_path'
     ];
 
     protected $casts = [
+        'amount' => 'decimal:2',
+        'discount_applied' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'total_paid' => 'decimal:2',
         'payment_date' => 'date',
-        'amount' => 'decimal:2'
     ];
 
-    // العلاقات
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
     }
 
-    public function member()
+    public function getPaymentMethodNameAttribute()
     {
-        return $this->belongsTo(Member::class);
+        $methods = [
+            'cash' => 'Espèces',
+            'card' => 'Carte bancaire',
+            'bank_transfer' => 'Virement bancaire',
+            'check' => 'Chèque'
+        ];
+        return $methods[$this->payment_method] ?? $this->payment_method;
     }
 
-    public function user()
+    public function getStatusNameAttribute()
     {
-        return $this->belongsTo(User::class);
+        $statuses = [
+            'pending' => 'En attente',
+            'completed' => 'Payé',
+            'failed' => 'Échoué',
+            'refunded' => 'Remboursé'
+        ];
+        return $statuses[$this->status] ?? $this->status;
     }
-
-    // دالة لإنشاء رقم فاتورة فريد
-    public static function generatePaymentNumber()
-    {
-        $prefix = 'INV';
-        $year = date('Y');
-        $month = date('m');
-        $lastPayment = self::whereYear('created_at', $year)
-                          ->whereMonth('created_at', $month)
-                          ->orderBy('id', 'desc')
-                          ->first();
-
-        if ($lastPayment) {
-            $lastNumber = intval(substr($lastPayment->payment_number, -4));
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '0001';
-        }
-
-        return "{$prefix}-{$year}{$month}-{$newNumber}";
-    }
-
-    // دالة للحصول على طريقة الدفع بالعربية
-    public function getPaymentMethodTextAttribute()
-    {
-        return match($this->payment_method) {
-            'cash' => 'نقداً',
-            'card' => 'بطاقة بنكية',
-            'bank_transfer' => 'تحويل بنكي',
-            'check' => 'شيك',
-            default => $this->payment_method
-        };
-    }
-
 }

@@ -1,7 +1,9 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Paiements ')
+@section('title', 'Paiements')
+
 @section('content')
+
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card bg-success text-white shadow">
@@ -11,6 +13,7 @@
             </div>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="card bg-info text-white shadow">
             <div class="card-body">
@@ -19,6 +22,7 @@
             </div>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="card bg-warning text-white shadow">
             <div class="card-body">
@@ -29,6 +33,32 @@
     </div>
 </div>
 
+<!-- Table summary -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Facture</th>
+                    <th>Membre</th>
+                    <th>Montant</th>
+                    <th>Méthode</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        Aucun paiement pour le moment
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Historique -->
 <div class="card shadow">
     <div class="card-header bg-white">
         <div class="d-flex justify-content-between align-items-center">
@@ -36,11 +66,13 @@
                 <i class="fas fa-credit-card text-primary me-2"></i>
                 Historique des paiements
             </h5>
+
             <a href="{{ route('admin.payments.export') }}" class="btn btn-success btn-sm">
                 <i class="fas fa-download me-1"></i> Exporter CSV
             </a>
         </div>
     </div>
+
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -55,24 +87,37 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @forelse($payments ?? [] as $payment)
                     <tr>
-                        <td>
-                            <span class="fw-bold text-primary">#{{ $payment->invoice_number ?? $payment->id }}</span>
+                        <td class="fw-bold text-primary">
+                            #{{ $payment->invoice_number ?? $payment->id }}
                         </td>
+
                         <td>
-                            <div class="fw-bold">{{ $payment->subscription->member->full_name ?? 'N/A' }}</div>
-                            <small class="text-muted">{{ $payment->subscription->member->email ?? '' }}</small>
+                            <div class="fw-bold">
+                                {{ $payment->subscription->member->full_name ?? 'N/A' }}
+                            </div>
+                            <small class="text-muted">
+                                {{ $payment->subscription->member->email ?? '' }}
+                            </small>
                         </td>
-                        <td class="fw-bold">{{ number_format($payment->total_paid ?? $payment->amount, 2) }} DH</td>
+
+                        <td class="fw-bold">
+                            {{ number_format($payment->amount ?? 0, 2) }} DH
+                        </td>
+
                         <td>
                             <span class="badge bg-secondary">
-                                <i class="fas fa-{{ $payment->payment_method == 'cash' ? 'money-bill-wave' : ($payment->payment_method == 'card' ? 'credit-card' : 'university') }} me-1"></i>
-                                {{ ucfirst($payment->payment_method) }}
+                                {{ ucfirst($payment->payment_method ?? 'N/A') }}
                             </span>
                         </td>
-                        <td>{{ $payment->payment_date ? $payment->payment_date->format('d/m/Y') : '-' }}</td>
+
+                        <td>
+                            {{ $payment->payment_date ? $payment->payment_date->format('d/m/Y') : '-' }}
+                        </td>
+
                         <td>
                             @if($payment->status == 'completed')
                                 <span class="badge bg-success">Payé</span>
@@ -82,6 +127,7 @@
                                 <span class="badge bg-danger">{{ $payment->status }}</span>
                             @endif
                         </td>
+
                         <td>
                             <a href="{{ route('admin.payments.show', $payment) }}" class="btn btn-sm btn-info">
                                 <i class="fas fa-eye"></i>
@@ -97,8 +143,10 @@
                     </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
     </div>
 </div>
+
 @endsection

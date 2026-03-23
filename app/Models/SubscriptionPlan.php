@@ -9,19 +9,15 @@ class SubscriptionPlan extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'duration_type',
-        'duration_months',
-        'price',
-        'description',
-        'features',
-        'is_active'
+        'name', 'duration_type', 'duration_months', 'price',
+        'discount_price', 'description', 'features', 'is_active', 'sort_order'
     ];
 
     protected $casts = [
         'features' => 'array',
         'is_active' => 'boolean',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'discount_price' => 'decimal:2',
     ];
 
     public function subscriptions()
@@ -29,37 +25,9 @@ class SubscriptionPlan extends Model
         return $this->hasMany(Subscription::class, 'plan_id');
     }
 
-    // دالة مساعدة للحصول على اسم المدة بالعربية
-    public function getDurationTextAttribute()
+    public function getCurrentPriceAttribute()
     {
-        return match($this->duration_type) {
-            'monthly' => 'شهري',
-            'quarterly' => 'ربع سنوي',
-            'yearly' => 'سنوي',
-            default => $this->duration_type
-        };
+        return $this->discount_price ?? $this->price;
     }
-    // زيدي مع العلاقات الموجودة
-public function plan()
-{
-    return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
-}
-
-// دالة لحساب المبلغ المتبقي
-public function calculateRemainingAmount()
-{
-    return $this->price - $this->amount_paid;
-}
-
-// دالة للتحقق إذا كان مدفوع بالكامل
-public function isFullyPaid()
-{
-    return $this->payment_status === 'paid';
-}
-
-// دالة للتحقق إذا كان الاشتراك ساري المفعول
-public function isValid()
-{
-    return $this->is_active && $this->end_date >= now();
-}
+    
 }
