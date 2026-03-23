@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\SubscriptionController;
-use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\FinanceController;
 
 use App\Http\Controllers\HomeController;
@@ -132,3 +132,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 require __DIR__.'/auth.php';
+
+Route::resource('payments', PaymentController::class);
+
+Route::get('/check-subscription/{id}', 
+    [PaymentController::class,'checkSubscription']);
+
+Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+Route::get('/payments/create', [PaymentController::class, 'create'])->name('payments.create');
+Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
