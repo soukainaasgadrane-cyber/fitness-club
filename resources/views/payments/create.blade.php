@@ -18,32 +18,36 @@
 <form action="{{ route('payments.store') }}" method="POST">
 @csrf
 
+<!-- Member -->
 <label>Membre</label>
 <select name="member_id">
-@foreach($members as $member)
-<option value="{{ $member->id }}">
-    {{ $member->name }}
-</option>
-@endforeach
+    @foreach($members as $member)
+        <option value="{{ $member->id }}">
+            {{ $member->name }}
+        </option>
+    @endforeach
 </select>
 
 <br><br>
 
+<!-- Plan -->
 <label>Plan</label>
 <select name="plan_id">
-@foreach($plans as $plan)
-<option value="{{ $plan->id }}">
-    {{ $plan->name }} - {{ $plan->price }} DH
-</option>
-@endforeach
+    @foreach($plans as $plan)
+        <option value="{{ $plan->id }}">
+            {{ $plan->name }} - {{ $plan->price }} DH
+        </option>
+    @endforeach
 </select>
 
 <br><br>
 
+<!-- Status -->
 <label>Status</label>
 <select name="status">
-<option value="payé">Payé</option>
-<option value="non payé">Non payé</option>
+    <option value="pending">En attente</option>
+    <option value="completed">Payé</option>
+    <option value="failed">Échoué</option>
 </select>
 
 <br><br>

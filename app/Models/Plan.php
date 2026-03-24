@@ -8,8 +8,8 @@ class Plan extends Model
 {
     protected $fillable = ['name','price','duration'];
 
-public function payments()
-{
-    return $this->hasMany(Payment::class);
-}
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

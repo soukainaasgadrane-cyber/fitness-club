@@ -9,4 +9,9 @@ class ProgramController extends Controller
     {
         return view('programs.index');
     }
+
+    public function show($id)
+    {
+        return view('programs.show');
+    }
 }
