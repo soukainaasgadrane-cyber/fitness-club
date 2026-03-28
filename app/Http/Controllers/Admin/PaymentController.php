@@ -1,82 +1,50 @@
 <?php
-namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers;
+
 use App\Models\Payment;
-use App\Models\Subscription;
+use App\Models\Member;
+use App\Models\Plan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $payments = Payment::with('subscription.member')
-                          ->latest()
-                          ->paginate(20);
-        
-        $totalReceived = Payment::where('status', 'completed')->sum('total_paid');
-        $todayPayments = Payment::whereDate('payment_date', today())->sum('total_paid');
-        $pendingCount = Payment::where('status', 'pending')->count();
-        
-        return view('admin.payments.index', compact('payments', 'totalReceived', 'todayPayments', 'pendingCount'));
+        $payments = Payment::with('member','plan')->get();
+
+        $totalReceived = Payment::where('status','payé')->sum('amount');
+
+        return view('payments.index', compact('payments','totalReceived'));
     }
 
     public function create()
     {
-        $subscriptions = Subscription::where('payment_status', 'pending')
-                                    ->with('member')
-                                    ->get();
-        
-        return view('admin.payments.create', compact('subscriptions'));
+        $members = Member::all();
+        $plans = Plan::all();
+
+        return view('payments.create', compact('members','plans'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'subscription_id' => 'required|exists:subscriptions,id',
-            'amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,card,bank_transfer,check',
-            'payment_date' => 'required|date',
-            'notes' => 'nullable|string'
+        $request->validate([
+            'member_id' => 'required',
+            'plan_id' => 'required',
+            'status' => 'required'
         ]);
 
-        $subscription = Subscription::findOrFail($request->subscription_id);
-        
-        $invoiceNumber = 'PAY-' . date('Ymd') . '-' . Str::random(6);
-        
-        $payment = Payment::create([
-            'subscription_id' => $subscription->id,
-            'invoice_number' => $invoiceNumber,
-            'amount' => $subscription->total_amount,
-            'total_paid' => $request->amount,
-            'payment_method' => $request->payment_method,
-            'payment_date' => $request->payment_date,
-            'status' => 'completed',
-            'notes' => $request->notes
+        $plan = Plan::find($request->plan_id);
+
+        Payment::create([
+            'member_id' => $request->member_id,
+            'plan_id' => $request->plan_id,
+            'amount' => $plan->price,
+            'payment_date' => now(),
+            'status' => $request->status
         ]);
 
-        // Mettre à jour l'abonnement
-        $subscription->update([
-            'payment_status' => 'paid',
-            'payment_date' => $request->payment_date,
-            'payment_method' => $request->payment_method
-        ]);
-
-        return redirect()->route('admin.payments.show', $payment)
-                        ->with('success', 'Paiement enregistré avec succès');
-    }
-
-    public function show(Payment $payment)
-    {
-        $payment->load('subscription.member');
-        return view('admin.payments.show', compact('payment'));
-    }
-
-    public function downloadReceipt(Payment $payment)
-    {
-        // Ici vous pouvez générer un PDF de reçu
-        // Pour l'instant, on redirige juste
-        return redirect()->back()->with('info', 'Fonctionnalité de génération de reçu à venir');
+        return redirect()->route('payments.index')
+            ->with('success','Payment ajouté');
     }
 }

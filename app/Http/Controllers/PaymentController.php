@@ -2,53 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Member;
 use App\Models\Plan;
+use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    // Afficher historique des paiements
     public function index()
     {
-        $payments = Payment::with('member', 'plan')->get();
-        return view('payments.index', compact('payments'));
+        $payments = Payment::with('member','plan')->get();
+
+        $totalReceived = Payment::where('status','payé')->sum('amount');
+
+        return view('payments.index', compact('payments','totalReceived'));
     }
 
-    // Afficher form ajouter payment
     public function create()
     {
         $members = Member::all();
         $plans = Plan::all();
-        return view('payments.create', compact('members', 'plans'));
+
+        return view('payments.create', compact('members','plans'));
     }
 
-    // Enregistrer payment
-   public function store(Request $request)
-{
-    $plan = Plan::find($request->plan_id);
-
-    Payment::create([
-        'member_id' => $request->member_id,
-        'plan_id' => $request->plan_id,
-        'amount' => $plan->price,
-        'payment_date' => now(),
-        'status' => $request->status
-    ]);
-
-    return redirect()->route('payments.index')
-    ->with('success','Payment ajouté');
-}
-
-    // Vérifier abonnement
-    public function checkSubscription($member_id)
+    public function store(Request $request)
     {
-        $payment = Payment::where('member_id', $member_id)
-                          ->where('status', 'payé')
-                          ->latest()
-                          ->first();
+        $request->validate([
+            'member_id' => 'required',
+            'plan_id' => 'required',
+            'status' => 'required'
+        ]);
 
-        return $payment ? "Abonnement actif" : "Abonnement expiré";
+        $plan = Plan::find($request->plan_id);
+
+        Payment::create([
+            'member_id' => $request->member_id,
+            'plan_id' => $request->plan_id,
+            'amount' => $plan->price,
+            'payment_date' => now(),
+            'status' => $request->status
+        ]);
+return redirect()->route('payments.create')
+    ->with('success','Payment enregistré avec succès');
     }
 }
