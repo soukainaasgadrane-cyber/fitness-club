@@ -7,26 +7,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('member_id')->constrained()->onDelete('cascade');
-            $table->enum('plan_type', ['monthly', 'quarterly', 'yearly']);
-            $table->decimal('price', 8, 2);
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->enum('payment_status', ['paid', 'pending', 'overdue'])->default('pending');
-            $table->enum('payment_method', ['cash', 'card', 'bank_transfer'])->nullable();
-            $table->text('notes')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-            
-            // Index for better performance
-            $table->index(['member_id', 'start_date', 'end_date']);
+        Schema::table('subscriptions', function (Blueprint $table) {
+            $table->string('invoice_number')->nullable()->unique()->after('id');
+            $table->date('payment_due_date')->nullable()->after('end_date');
+            $table->date('payment_date')->nullable()->after('payment_due_date');
+            $table->decimal('discount', 8, 2)->default(0)->after('price');
+            $table->decimal('total_amount', 8, 2)->after('discount');
+            $table->text('payment_receipt')->nullable()->after('payment_method');
+            $table->string('transaction_id')->nullable()->after('payment_receipt');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('subscriptions');
+        Schema::table('subscriptions', function (Blueprint $table) {
+            $table->dropColumn([
+                'invoice_number', 'payment_due_date', 'payment_date',
+                'discount', 'total_amount', 'payment_receipt', 'transaction_id'
+            ]);
+        });
     }
 };

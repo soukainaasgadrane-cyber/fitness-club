@@ -9,24 +9,19 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->string('payment_number')->unique(); // رقم الفاتورة
             $table->foreignId('subscription_id')->constrained()->onDelete('cascade');
-            $table->foreignId('member_id')->constrained();
-            $table->foreignId('user_id')->constrained(); // الموظف اللي استلم الفلوس
-            $table->decimal('amount', 8, 2);
+            $table->string('invoice_number')->unique();
+            $table->decimal('amount', 10, 2);
+            $table->decimal('discount_applied', 8, 2)->default(0);
+            $table->decimal('tax', 8, 2)->default(0);
+            $table->decimal('total_paid', 10, 2);
             $table->enum('payment_method', ['cash', 'card', 'bank_transfer', 'check']);
-            $table->enum('payment_type', ['full', 'partial', 'installment'])->default('full');
-            $table->string('transaction_id')->nullable(); // رقم العملية (للبطاقة)
-            $table->string('check_number')->nullable(); // رقم الشيك
+            $table->string('transaction_id')->nullable();
             $table->date('payment_date');
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->text('notes')->nullable();
-            $table->enum('status', ['completed', 'pending', 'failed', 'refunded'])->default('completed');
-            $table->string('receipt_path')->nullable(); // مسار وصل الدفع
+            $table->string('receipt_path')->nullable();
             $table->timestamps();
-
-            // Indexes
-            $table->index('payment_number');
-            $table->index('payment_date');
         });
     }
 
