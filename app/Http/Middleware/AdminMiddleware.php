@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -14,6 +13,6 @@ class AdminMiddleware
             return $next($request);
         }
 
-        return redirect('/')->with('error', 'Vous n\'avez pas accès à cette section.');
+        return redirect('/')->with('error', 'Accès non autorisé');
     }
 }

@@ -64,12 +64,15 @@ class Subscription extends Model
         if ($this->end_date < now()) {
             return 'expired';
         }
+
         if ($this->payment_status === 'paid') {
             return 'active';
         }
+
         if ($this->payment_due_date && $this->payment_due_date < now()) {
             return 'overdue';
         }
+
         return 'pending';
     }
 
@@ -78,6 +81,7 @@ class Subscription extends Model
         if ($this->end_date < now()) {
             return 0;
         }
+
         return now()->diffInDays($this->end_date);
     }
 
