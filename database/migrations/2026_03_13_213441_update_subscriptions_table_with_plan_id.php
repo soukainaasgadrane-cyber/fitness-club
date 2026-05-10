@@ -8,13 +8,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            
-            $table->foreignId('plan_id')->nullable()->constrained('subscription_plans')->nullOnDelete();
-            
-            
-            $table->decimal('amount_paid', 8, 2)->nullable(); // المبلغ المدفوع
-            $table->decimal('remaining_amount', 8, 2)->default(0); // المبلغ المتبقي
-            $table->enum('payment_status', ['paid', 'partial', 'pending', 'overdue'])->default('pending')->change();
+            if (!Schema::hasColumn('subscriptions', 'plan_id')) {
+                $table->foreignId('plan_id')->nullable()->constrained('subscription_plans')->nullOnDelete();
+            } else {
+                $table->foreign('plan_id')->references('id')->on('subscription_plans')->nullOnDelete();
+            }
+
+            if (!Schema::hasColumn('subscriptions', 'amount_paid')) {
+                $table->decimal('amount_paid', 8, 2)->nullable();
+            }
+
+            if (!Schema::hasColumn('subscriptions', 'remaining_amount')) {
+                $table->decimal('remaining_amount', 8, 2)->default(0);
+            }
         });
     }
 

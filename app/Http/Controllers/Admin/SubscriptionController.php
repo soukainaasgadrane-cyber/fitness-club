@@ -6,10 +6,34 @@ use App\Models\Member;
 use App\Models\SubscriptionPlan;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
+    public function index()
+    {
+        $subscriptions = Subscription::with(['member', 'plan'])->latest()->paginate(15);
+
+        $totalSubscriptions = Subscription::count();
+        $activeSubscriptions = Subscription::active()->count();
+        $totalRevenue = Subscription::where('payment_status', 'paid')->sum('total_amount');
+        $monthRevenue = Subscription::where('payment_status', 'paid')
+            ->whereMonth('payment_date', now()->month)
+            ->whereYear('payment_date', now()->year)
+            ->sum('total_amount');
+        $pendingPayments = Subscription::where('payment_status', 'pending')->count();
+        $expiredSubscriptions = Subscription::expired()->count();
+
+        return view('admin.subscriptions.index', compact(
+            'subscriptions',
+            'totalSubscriptions',
+            'activeSubscriptions',
+            'totalRevenue',
+            'monthRevenue',
+            'pendingPayments',
+            'expiredSubscriptions'
+        ));
+    }
+
     public function create()
     {
         $members = Member::where('is_active', true)->get();
@@ -30,24 +54,31 @@ class SubscriptionController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        $plan = SubscriptionPlan::findOrFail($request->plan_id);
+        $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
         
-        $subscription = Subscription::create([
-            'member_id' => $request->member_id,
+        Subscription::create([
+            'member_id' => $validated['member_id'],
             'plan_id' => $plan->id,
             'plan_type' => $plan->duration_type,
-            'price' => $request->price,
-            'total_amount' => $request->price,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'payment_due_date' => $request->start_date,
+            'price' => $validated['price'],
+            'total_amount' => $validated['price'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'payment_due_date' => $validated['start_date'],
             'payment_status' => 'pending',
-            'payment_method' => $request->payment_method,
-            'notes' => $request->notes,
+            'payment_method' => $validated['payment_method'],
+            'notes' => $validated['notes'] ?? null,
             'is_active' => true
         ]);
 
         return redirect()->route('admin.subscriptions.index')
                         ->with('success', 'Abonnement créé avec succès');
+    }
+
+    public function show(Subscription $subscription)
+    {
+        $subscription->load(['member', 'plan']);
+
+        return view('admin.subscriptions.show', compact('subscription'));
     }
 }
